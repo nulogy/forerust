@@ -10,11 +10,14 @@ extern crate ansi_term;
 use ansi_term::Colour::*;
 
 use futures::{BoxFuture, Future, Stream, future};
+
+use std::fs::File;
 use std::io;
+use std::io::Read;
 use tokio_core::reactor::Core;
 use tokio_process::{CommandExt, Child};
 
-use forerust::ForerustProcess;
+use forerust::{ ForerustProcess, parse_procfile };
 
 const PREFIX_COLOURS: [ansi_term::Color; 6] = [Cyan, Yellow, Green, Purple, Red, Blue];
 
@@ -48,10 +51,12 @@ fn longest_command_length(processes: &Vec<ForerustProcess>) -> usize {
 fn main() {
     dotenv::dotenv().ok();
 
-    let processes = vec![
-        ForerustProcess{ name: String::from("foobarbizbaz"), command: String::from("./test1.rb itworks") },
-        ForerustProcess{ name: String::from("hello"), command: String::from("./test2.rb") }
-    ];
+    let mut procfile = File::open("Procfile").unwrap();
+    let mut procfile_contents = String::new();
+
+    procfile.read_to_string(&mut procfile_contents);
+
+    let processes = parse_procfile(procfile_contents);
 
     let pad_size = longest_command_length(&processes);
     let mut core = Core::new().unwrap();
