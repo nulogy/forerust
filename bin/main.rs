@@ -46,7 +46,7 @@ fn longest_command_length(processes: &Vec<ForerustProcess>) -> usize {
 }
 
 fn main() {
-    dotenv::dotenv().unwrap();
+    dotenv::dotenv().ok();
 
     let processes = vec![
         ForerustProcess{ name: String::from("foobarbizbaz"), command: String::from("./test1.rb") },
