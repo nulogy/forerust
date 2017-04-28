@@ -1,3 +1,4 @@
+extern crate dotenv;
 extern crate futures;
 extern crate tokio_core;
 extern crate tokio_process;
@@ -35,6 +36,7 @@ fn get_lines(prefix: String, mut cmd: Child) -> BoxFuture<(), io::Error> {
 }
 
 fn main() {
+    dotenv::dotenv().unwrap();
 
     let processes = vec![
         ForerustProcess{ name: String::from("Hello"), command: String::from("./test1.rb") },
