@@ -4,7 +4,7 @@ extern crate tokio_process;
 extern crate tokio_io;
 
 use std::io;
-use std::process::{Command, Stdio, Output};
+use std::process::{Command, Stdio};
 
 use futures::{BoxFuture, Future, Stream, future};
 use tokio_core::reactor::Core;
@@ -23,7 +23,7 @@ impl ForerustProcess {
     }
 }
 
-fn get_lines(prefix: String, mut cmd: Child) -> BoxFuture<((), Output), io::Error> {
+fn get_lines(prefix: String, mut cmd: Child) -> BoxFuture<(), io::Error> {
     let stdout = cmd.stdout().take().unwrap();
     let reader = io::BufReader::new(stdout);
     let lines = tokio_io::io::lines(reader);
@@ -31,7 +31,7 @@ fn get_lines(prefix: String, mut cmd: Child) -> BoxFuture<((), Output), io::Erro
         println!("{}| {}", prefix, l);
         Ok(())
     });
-    cycle.join(cmd.wait_with_output()).boxed()
+    cycle.join(cmd.wait_with_output()).map(|_| ()).boxed()
 }
 
 fn main() {
