@@ -48,17 +48,10 @@ fn main() {
         ForerustProcess{ name: String::from("World"), command: String::from("./test2.rb") }
     ];
 
-    // let output = Command::new("./test1.rb").output().unwrap();
-    // println!("{}", String::from_utf8_lossy(&output.stdout));
-
-    let result = future::result::<(), io::Error>(Ok(()));
-
-    // processes.iter().map(to_command)
-
     let mut core = Core::new().unwrap();
-    let thing = get_lines(processes[0].to_command().spawn_async(&core.handle()).unwrap());
-    let combined = result.join(thing);
+    let handle = core.handle();
+    let linegetters = processes.iter().map(|f_p| get_lines(f_p.to_command().spawn_async(&handle).unwrap()));
+    let combined = future::join_all(linegetters);
 
-    let child = processes[0].to_command().spawn_async(&core.handle()).unwrap();
     core.run(combined).unwrap();
 }
