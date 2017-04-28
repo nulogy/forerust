@@ -16,6 +16,8 @@ use tokio_process::{CommandExt, Child};
 
 use forerust::ForerustProcess;
 
+const PREFIX_COLOURS: [ansi_term::Color; 6] = [Cyan, Yellow, Green, Purple, Red, Blue];
+
 fn get_lines_1<T: tokio_io::AsyncRead + Send + 'static>(colour: ansi_term::Colour, pad_size: usize, command_name: String, iostream: T) -> BoxFuture<(), io::Error> {
     let reader = io::BufReader::new(iostream);
     let lines = tokio_io::io::lines(reader);
