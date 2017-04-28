@@ -29,9 +29,8 @@ impl ForerustProcess {
     }
 }
 
-fn get_lines(colour: ansi_term::Colour, pad_size: usize, command_name: String, mut cmd: Child) -> BoxFuture<(), io::Error> {
-    let stdout = cmd.stdout().take().unwrap();
-    let reader = io::BufReader::new(stdout);
+fn get_lines_1<T: tokio_io::AsyncRead + Send + 'static>(colour: ansi_term::Colour, pad_size: usize, command_name: String, iostream: T) -> BoxFuture<(), io::Error> {
+    let reader = io::BufReader::new(iostream);
     let lines = tokio_io::io::lines(reader);
     let cycle = lines.for_each(move |l| {
         let now = chrono::Local::now();
@@ -39,6 +38,17 @@ fn get_lines(colour: ansi_term::Colour, pad_size: usize, command_name: String, m
         println!("{}{}", prefix, l);
         Ok(())
     });
+    cycle.boxed()
+}
+
+fn get_lines(colour: ansi_term::Colour, pad_size: usize, command_name: String, mut cmd: Child) -> BoxFuture<(), io::Error> {
+    let stdout = cmd.stdout().take().unwrap();
+    let stderr = cmd.stderr().take().unwrap();
+
+    let cycle_stdout = get_lines_1(colour, pad_size, command_name.clone(), stdout);
+    let cycle_stderr = get_lines_1(colour, pad_size, command_name.clone(), stderr);
+    let cycle = cycle_stdout.join(cycle_stderr);
+
     cycle.join(cmd.wait_with_output()).map(|_| ()).boxed()
 }
 
