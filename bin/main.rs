@@ -1,3 +1,4 @@
+extern crate dotenv;
 extern crate futures;
 extern crate tokio_core;
 extern crate tokio_process;
@@ -47,6 +48,7 @@ fn longest_command_length(processes: &Vec<ForerustProcess>) -> usize {
 }
 
 fn main() {
+    dotenv::dotenv().unwrap();
 
     let processes = vec![
         ForerustProcess{ name: String::from("foobarbizbaz"), command: String::from("./test1.rb") },
