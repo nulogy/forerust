@@ -29,32 +29,36 @@ impl ForerustProcess {
     }
 }
 
-fn get_lines(colour: ansi_term::Colour, prefix: String, mut cmd: Child) -> BoxFuture<(), io::Error> {
+fn get_lines(colour: ansi_term::Colour, pad_size: usize, command_name: String, mut cmd: Child) -> BoxFuture<(), io::Error> {
     let stdout = cmd.stdout().take().unwrap();
     let reader = io::BufReader::new(stdout);
     let lines = tokio_io::io::lines(reader);
-    let colored_prefix = colour.paint(prefix);
     let cycle = lines.for_each(move |l| {
         let now = chrono::Local::now();
-        let colored_time = colour.paint(format!("{}", now.format("%H:%M:%S")));
-        println!("{} {}| {}", colored_time, colored_prefix, l);
+        let prefix = colour.paint(format!("{} {: >pad_size$} | ", now.format("%H:%M:%S"), command_name, pad_size = pad_size));
+        println!("{}{}", prefix, l);
         Ok(())
     });
     cycle.join(cmd.wait_with_output()).map(|_| ()).boxed()
 }
 
+fn longest_command_length(processes: &Vec<ForerustProcess>) -> usize {
+    processes.iter().map(|p| p.name.len()).max().unwrap()
+}
+
 fn main() {
 
     let processes = vec![
-        ForerustProcess{ name: String::from("Hello"), command: String::from("./test1.rb") },
-        ForerustProcess{ name: String::from("World"), command: String::from("./test2.rb") }
+        ForerustProcess{ name: String::from("foobarbizbaz"), command: String::from("./test1.rb") },
+        ForerustProcess{ name: String::from("hello"), command: String::from("./test2.rb") }
     ];
 
+    let pad_size = longest_command_length(&processes);
     let mut core = Core::new().unwrap();
     let handle = core.handle();
     let linegetters = processes.iter().enumerate().map(|(index, f_p)| {
         let colour = PREFIX_COLOURS[index % PREFIX_COLOURS.len()];
-        get_lines(colour, f_p.name.clone(), f_p.to_command().spawn_async(&handle).unwrap())
+        get_lines(colour, pad_size, f_p.name.clone(), f_p.to_command().spawn_async(&handle).unwrap())
     });
     let combined = future::select_all(linegetters).map_err(|e| e.1);
 
