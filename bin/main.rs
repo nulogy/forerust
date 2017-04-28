@@ -49,7 +49,7 @@ fn main() {
     dotenv::dotenv().ok();
 
     let processes = vec![
-        ForerustProcess{ name: String::from("foobarbizbaz"), command: String::from("./test1.rb") },
+        ForerustProcess{ name: String::from("foobarbizbaz"), command: String::from("./test1.rb itworks") },
         ForerustProcess{ name: String::from("hello"), command: String::from("./test2.rb") }
     ];
 
