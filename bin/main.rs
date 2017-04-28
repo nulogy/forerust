@@ -1,28 +1,16 @@
 extern crate dotenv;
+extern crate forerust;
 extern crate futures;
 extern crate tokio_core;
 extern crate tokio_process;
 extern crate tokio_io;
 
-use std::io;
-use std::process::{Command, Stdio};
-
 use futures::{BoxFuture, Future, Stream, future};
+use std::io;
 use tokio_core::reactor::Core;
 use tokio_process::{CommandExt, Child};
 
-struct ForerustProcess {
-    pub name: String,
-    command: String,
-}
-
-impl ForerustProcess {
-    fn to_command(&self) -> Command {
-        let mut cmd = Command::new(self.command.clone());
-        cmd.stdout(Stdio::piped()).stderr(Stdio::piped());
-        cmd
-    }
-}
+use forerust::ForerustProcess;
 
 fn get_lines(prefix: String, mut cmd: Child) -> BoxFuture<(), io::Error> {
     let stdout = cmd.stdout().take().unwrap();
