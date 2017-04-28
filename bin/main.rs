@@ -54,7 +54,7 @@ fn main() {
     let mut procfile = File::open("Procfile").unwrap();
     let mut procfile_contents = String::new();
 
-    procfile.read_to_string(&mut procfile_contents);
+    procfile.read_to_string(&mut procfile_contents).unwrap();
 
     let processes = parse_procfile(procfile_contents);
 

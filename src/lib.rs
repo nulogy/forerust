@@ -1,12 +1,3 @@
-extern crate serde;
-
-use serde::{ Deserialize, Deserializer };
-use serde::de;
-use serde::de::Visitor;
-
-use std::fmt;
-use std::fmt::Display;
-use std::result::Result;
 use std::process::{Command, Stdio};
 
 type ForerustProcfile = Vec<ForerustProcess>;
