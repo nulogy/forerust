@@ -1,4 +1,15 @@
+extern crate serde;
+
+use serde::{ Deserialize, Deserializer };
+use serde::de;
+use serde::de::Visitor;
+
+use std::fmt;
+use std::fmt::Display;
+use std::result::Result;
 use std::process::{Command, Stdio};
+
+type ForerustProcfile = Vec<ForerustProcess>;
 
 #[derive(Eq, PartialEq)]
 pub struct ForerustProcess {
@@ -12,6 +23,16 @@ impl ForerustProcess {
         cmd.stdout(Stdio::piped()).stderr(Stdio::piped());
         cmd
     }
+}
+
+pub fn parse_procfile(procfile_as_string: String) -> ForerustProcfile {
+    procfile_as_string.lines().map(|line| {
+        let process: Vec<String> = line.split(": ").map(|slice| slice.to_string()).map(|slice| slice.to_string()).collect();
+        ForerustProcess {
+            name: process[0].clone(),
+            command: process[1].clone()
+        }
+    }).collect()
 }
 
 #[cfg(test)]
