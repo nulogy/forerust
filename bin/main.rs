@@ -3,6 +3,8 @@ extern crate tokio_core;
 extern crate tokio_process;
 extern crate tokio_io;
 
+extern crate chrono;
+
 use std::io;
 use std::process::{Command, Stdio};
 
@@ -28,7 +30,8 @@ fn get_lines(prefix: String, mut cmd: Child) -> BoxFuture<(), io::Error> {
     let reader = io::BufReader::new(stdout);
     let lines = tokio_io::io::lines(reader);
     let cycle = lines.for_each(move |l| {
-        println!("{}| {}", prefix, l);
+        let now = chrono::Local::now();
+        println!("{} {}| {}", now.format("%H:%M:%S"), prefix, l);
         Ok(())
     });
     cycle.join(cmd.wait_with_output()).map(|_| ()).boxed()
