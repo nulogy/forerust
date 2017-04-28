@@ -19,7 +19,8 @@ pub struct ForerustProcess {
 
 impl ForerustProcess {
     pub fn to_command(&self) -> Command {
-        let mut cmd = Command::new(self.command.clone());
+        let mut cmd = Command::new("/bin/sh");
+        cmd.arg("-c").arg(self.command.clone());
         cmd.stdout(Stdio::piped()).stderr(Stdio::piped());
         cmd
     }
