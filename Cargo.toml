@@ -4,3 +4,11 @@ version = "0.0.1"
 authors = ["Justin Fitzsimmons <justinf@nulogy.com>", "Ryan De Villa <ryand@nulogy.com>"]
 
 [dependencies]
+futures = "0.1"
+tokio-core = "0.1"
+tokio-process = "0.1"
+tokio-io = "0.1"
+
+[[bin]]
+name = "forerust"
+path = "bin/main.rs"
