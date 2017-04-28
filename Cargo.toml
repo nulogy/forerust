@@ -1,0 +1,6 @@
+[package]
+name = "forerust"
+version = "0.0.1"
+authors = ["Justin Fitzsimmons <justinf@nulogy.com>", "Ryan De Villa <ryand@nulogy.com>"]
+
+[dependencies]
