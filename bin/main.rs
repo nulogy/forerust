@@ -44,7 +44,7 @@ fn main() {
     let mut core = Core::new().unwrap();
     let handle = core.handle();
     let linegetters = processes.iter().map(|f_p| get_lines(f_p.name.clone(), f_p.to_command().spawn_async(&handle).unwrap()));
-    let combined = future::join_all(linegetters);
+    let combined = future::select_all(linegetters).map_err(|e| e.1);
 
     core.run(combined).unwrap();
 }
